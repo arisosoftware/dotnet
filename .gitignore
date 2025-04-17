@@ -28,6 +28,11 @@ project.lock.json
 project.fragment.lock.json
 artifacts/
 
+# Ignore all .zip files in gpt folder in the repository
+
+gpt/**/*.zip
+
+
 # ASP.NET Scaffolding
 ScaffoldingReadMe.txt
 
@@ -40,6 +45,12 @@ ScaffoldingReadMe.txt
 ~$*
 *~
 CodeCoverage/
+
+# macOS system files
+.DS_Store
+
+# Windows system files
+Thumbs.db
 
 # MSBuild Binary and Structured Log
 *.binlog

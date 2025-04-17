@@ -1,0 +1,39 @@
+@page "/inbox"
+@using FakeMail.Database
+@using FakeMail.Database.Models
+@inject FakeMailDbContext Db
+
+<h3>Inbox</h3>
+
+<input type="text" @bind="filter" placeholder="Enter your email..." class="form-control mb-2" />
+<button @onclick="LoadEmails" class="btn btn-primary mb-3">View</button>
+
+@if (emails == null)
+{
+    <p>No emails yet.</p>
+}
+else
+{
+    <ul>
+        @foreach (var email in emails)
+        {
+            <li>
+                <b>@email.Subject</b> from @email.Sender on @email.ReceivedAt
+                <pre>@email.Body</pre>
+            </li>
+        }
+    </ul>
+}
+
+@code {
+    string filter = "";
+    List<EmailMessage>? emails;
+
+    async Task LoadEmails()
+    {
+        emails = await Db.Emails
+            .Where(e => e.Recipient.Contains(filter))
+            .OrderByDescending(e => e.ReceivedAt)
+            .ToListAsync();
+    }
+}
