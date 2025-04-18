@@ -64,3 +64,4 @@ Thumbs.db
 TestResult.xml
 nunit-*.xml
 .git-credentials
+FakeMail/.vs/*

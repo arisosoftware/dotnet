@@ -7,13 +7,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeMail.Server", "FakeMail
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeMail.Database", "FakeMail.Database\FakeMail.Database.csproj", "{959FEB67-C321-4459-90A9-00301FF42878}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FakeMail.ServerTest", "FakeMail.ServerTest\FakeMail.ServerTest.csproj", "{A2FE9432-3492-4797-8DA5-845A444A1606}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
-	EndGlobalSection
-	GlobalSection(SolutionProperties) = preSolution
-		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{D9FA7045-11ED-4EB4-8C5C-7CEAAA0B2B86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -24,5 +23,12 @@ Global
 		{959FEB67-C321-4459-90A9-00301FF42878}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{959FEB67-C321-4459-90A9-00301FF42878}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{959FEB67-C321-4459-90A9-00301FF42878}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A2FE9432-3492-4797-8DA5-845A444A1606}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A2FE9432-3492-4797-8DA5-845A444A1606}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A2FE9432-3492-4797-8DA5-845A444A1606}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A2FE9432-3492-4797-8DA5-845A444A1606}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
 	EndGlobalSection
 EndGlobal

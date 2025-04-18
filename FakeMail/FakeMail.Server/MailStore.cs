@@ -1,14 +1,17 @@
-using SmtpServer;
-using SmtpServer.Storage;
-using SmtpServer.Protocol;
-using MimeKit;
-using Microsoft.EntityFrameworkCore;
 using FakeMail.Database;
+using FakeMail.Database.Models;
+using Microsoft.EntityFrameworkCore;
+using MimeKit;
+using SmtpServer;
+using SmtpServer.Mail;
+using SmtpServer.Protocol;
+using SmtpServer.Storage;
 using System.Buffers;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using System.IO;
+using System.IO.Pipelines; // Add this namespace for PipeReader.AsStream()
 
 public class MailStore : MessageStore
 {
@@ -19,9 +22,14 @@ public class MailStore : MessageStore
         _options = options;
     }
 
+
     public override async Task<SmtpResponse> SaveAsync(ISessionContext context, IMessageTransaction transaction, ReadOnlySequence<byte> buffer, CancellationToken cancellationToken)
     {
-        var message = MimeMessage.Load(buffer.AsStream());
+        using var stream = new MemoryStream();
+        await stream.WriteAsync(buffer.ToArray(), cancellationToken); // Convert ReadOnlySequence<byte> to a stream
+        stream.Position = 0; // Reset stream position to the beginning
+
+        var message = MimeMessage.Load(stream);
 
         using (var db = new FakeMailDbContext(_options))
         {
@@ -35,11 +43,12 @@ public class MailStore : MessageStore
             };
 
             db.Emails.Add(email);
-            await db.SaveChangesAsync(cancellationToken);  // Async save to the database
+            await db.SaveChangesAsync(cancellationToken);
 
             Console.WriteLine($"Mail received for {email.Recipient}: {email.Subject}");
         }
 
         return SmtpResponse.Ok;
     }
+     
 }

@@ -5,10 +5,11 @@ using Microsoft.EntityFrameworkCore;
 using FakeMail.Database;
 using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 class Program
 {
-    static async Task Main(string[] args)  // Main now asynchronous
+    static async Task Main(string[] args)
     {
         // Initialize the DbContext options
         var dbOptions = new DbContextOptionsBuilder<FakeMailDbContext>()
@@ -21,23 +22,28 @@ class Program
             db.Database.EnsureCreated();
         }
 
-        // Initialize MailStore (synchronously)
+        // Initialize MailStore
         var mailStore = new MailStore(dbOptions);
 
-        // Create SMTP server options (synchronously)
+        // Create a service provider to resolve dependencies
+        var serviceProvider = new ServiceCollection()
+            .AddSingleton<IMessageStore>(mailStore)
+            .BuildServiceProvider();
+
+        // Create SMTP server options
         var options = new SmtpServerOptionsBuilder()
             .ServerName("localhost")
             .Port(2525)
             .Build();
 
         // Initialize the SMTP server
-        var server = new SmtpServer.SmtpServer(options, mailStore);
+        var server = new SmtpServer.SmtpServer(options, serviceProvider);
 
-        // Start the SMTP server (await the async method)
+        // Start the SMTP server
         Console.WriteLine("SMTP server listening on port 2525...");
-        await server.StartAsync(System.Threading.CancellationToken.None);  // Start the server asynchronously
+        await server.StartAsync(System.Threading.CancellationToken.None);
 
-        // Keep the server running (infinite loop)
+        // Keep the server running
         Console.ReadLine();
     }
 }
