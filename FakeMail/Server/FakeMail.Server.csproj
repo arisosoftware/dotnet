@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\FakeMail.Database\FakeMail.Database.csproj" />
+    <ProjectReference Include="..\Database\FakeMail.Database.csproj" />
   </ItemGroup>
 
   <ItemGroup>

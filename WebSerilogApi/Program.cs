@@ -1,19 +1,23 @@
 using Serilog;
-
+using WebSeriLogApi.Contacts;
+using WebSeriLogApi.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add services to the container.
+builder.Services.AddControllers();
+// add DI of service
+builder.Services.AddSingleton<IMaskService, MaskService>();
 // Configure Serilog
 Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console()
-    .WriteTo.File("Logs/log.txt", rollingInterval: RollingInterval.Day)
-    .Enrich.FromLogContext()
+    .MinimumLevel.Debug() // Set minimum log level
+    .WriteTo.Console()    // Log to console
+    .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day) // Optional: Log to file
+    .Enrich.FromLogContext() // Include contextual information
     .CreateLogger();
 
+builder.Host.UseSerilog(); // Use Serilog as the logging provider
 
-builder.Host.UseSerilog(Log.Logger);    
-
-// Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -29,6 +33,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+
 var summaries = new[]
 {
     "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
@@ -36,7 +41,7 @@ var summaries = new[]
 
 app.MapGet("/weatherforecast", () =>
 {
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
+    var forecast = Enumerable.Range(1, 5).Select(index =>
         new WeatherForecast
         (
             DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
@@ -49,11 +54,12 @@ app.MapGet("/weatherforecast", () =>
 .WithName("GetWeatherForecast")
 .WithOpenApi();
 
+// Middleware and endpoint configuration
+app.UseRouting();
 app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
-
 record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 {
     public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);

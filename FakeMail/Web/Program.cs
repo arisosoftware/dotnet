@@ -9,6 +9,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddServerSideBlazor();
+builder.Services.AddRazorPages(); // Add Razor Pages services
 
 builder.Services.AddDbContext<FakeMailDbContext>(options =>
     options.UseSqlite("Data Source=../FakeMail.Server/fakemail.db"));
@@ -16,19 +17,16 @@ builder.Services.AddDbContext<FakeMailDbContext>(options =>
 var app = builder.Build();
 
 app.MapBlazorHub();
-
-app.MapFallbackToPage("/_Host");
+app.MapFallbackToPage("/_Host"); // Ensure Razor Pages fallback works
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
 app.UseAntiforgery();
 
@@ -36,4 +34,5 @@ app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
 app.Run();
- 
+
+
