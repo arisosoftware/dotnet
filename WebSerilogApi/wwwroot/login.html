@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login to .NET API</title>
+</head>
+<body>
+    <h2>Login</h2>
+    <label>Username:</label><br/>
+    <input type="text" id="username" placeholder="Username" /><br/><br/>
+
+    <label>Password:</label><br/>
+    <input type="password" id="password" placeholder="Password" /><br/><br/>
+
+    <button onclick="login()">Login</button>
+
+    <p id="response" style="margin-top:20px; font-weight:bold;"></p>
+
+    <script>
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            const loginData = {
+                username: username,
+                password: password,
+                ipAddress: "127.0.0.1" // or leave it out if backend auto-detects
+            };
+
+            try {
+                const response = await fetch('http://localhost:5179/api/Auth/Login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(loginData)
+                });
+
+                if (response.ok) {
+                    const text = await response.text();
+                    document.getElementById('response').textContent = "✅ Success: " + text;
+                } else {
+                    const error = await response.text();
+                    document.getElementById('response').textContent = "❌ Error: " + error;
+                }
+            } catch (err) {
+                document.getElementById('response').textContent = "❌ Network error: " + err.message;
+            }
+        }
+    </script>
+</body>
+</html>

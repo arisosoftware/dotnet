@@ -8,20 +8,20 @@ namespace WebSeriLogApi.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class SampleController : ControllerBase
+    public class AuthController : ControllerBase
     {
 
-        private readonly ILogger<SampleController> _logger;
+        private readonly ILogger<AuthController> _logger;
         private readonly IMaskService _maskService;
 
-        public SampleController(ILogger<SampleController> logger, IMaskService maskService)
+        public AuthController(ILogger<AuthController> logger, IMaskService maskService)
         {
             _logger = logger;
             _maskService = maskService;
         }
 
         [HttpPost]
-        public IActionResult SubmitForm(UserInputModel model)
+        public IActionResult Login(UserInputModel model)
         {
             // Log user input without sensitive data
             _logger.LogInformation("Received input from user: {@UserInput}", model);
