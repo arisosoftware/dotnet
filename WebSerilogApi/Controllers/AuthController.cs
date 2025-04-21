@@ -1,8 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using WebSeriLogApi.Contacts;
-using WebSeriLogApi.Models;
-using WebSeriLogApi.Services;
+using WebSeriLogApi.Models; 
 
 namespace WebSeriLogApi.Controllers
 {
@@ -21,7 +19,7 @@ namespace WebSeriLogApi.Controllers
         }
 
         [HttpPost]
-        public IActionResult Login(UserInputModel model)
+        public IActionResult Login(UserDto model)
         {
             // Log user input without sensitive data
             _logger.LogInformation("Received input from user: {@UserInput}", model);
