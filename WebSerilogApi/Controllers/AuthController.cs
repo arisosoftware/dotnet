@@ -19,8 +19,20 @@ namespace WebSeriLogApi.Controllers
         }
 
         [HttpPost]
-        public IActionResult Login(UserDto model)
+        public IActionResult Login([FromBody] UserDto model)
         {
+             if (!ModelState.IsValid)
+            {
+                // Log the model state errors
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    _logger.LogError("Model error: {Error}", error.ErrorMessage);
+                }
+
+                // Return a detailed error response
+                return BadRequest(ModelState);
+            }
+
             // Log user input without sensitive data
             _logger.LogInformation("Received input from user: {@UserInput}", model);
 
@@ -39,7 +51,9 @@ namespace WebSeriLogApi.Controllers
                 // Do not log the actual Email
             }
 
-            return Ok();
+            // Handle login logic here
+            return Ok(new { message = "Login successful!" });
+
         }
     }
 }

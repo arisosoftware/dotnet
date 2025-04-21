@@ -5,7 +5,7 @@ using WebSeriLogApi.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers() ;
 // add DI of service
 builder.Services.AddSingleton<IMaskService, MaskService>();
 // Configure Serilog
@@ -21,7 +21,6 @@ builder.Host.UseSerilog(); // Use Serilog as the logging provider
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 
 // Optional CORS if needed
 builder.Services.AddCors(options =>
