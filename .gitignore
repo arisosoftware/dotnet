@@ -67,3 +67,6 @@ nunit-*.xml
 FakeMail/.vs/*
 benchmark/ValidationBenchmark/BenchmarkDotNet.Artifacts*/
 benchmark/.vs/*
+/OAuthConsoleApp/.vs/OAuthConsoleApp
+/Serilog/.vs/SerilogMask
+/WebSerilogApi/.vs
