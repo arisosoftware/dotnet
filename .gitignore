@@ -65,9 +65,9 @@ TestResult.xml
 nunit-*.xml
 .git-credentials
 FakeMail/.vs/*
-benchmark/ValidationBenchmark/BenchmarkDotNet.Artifacts*/
-benchmark/.vs/*
+/benchmark/ValidationBenchmark/BenchmarkDotNet.Artifacts*/
+/benchmark/.vs/*
 /OAuthConsoleApp/.vs/OAuthConsoleApp
 /Serilog/.vs/SerilogMask
-/WebSerilogApi/.vs
-/Serilog/.vs/ProjectEvaluation
+/WebSerilogApi/.vs/*
+/Serilog/.vs/*
