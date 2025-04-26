@@ -7,12 +7,12 @@ using System.Collections.Generic;
 
 namespace SerilogMask.Core.Logging
 {
-    public class MaskingEnricher : ILogEventEnricher
+    public class SerilogMaskingEnricher : ILogEventEnricher
     {
         private readonly Dictionary<string, string> _directlyMaskDict;
         private readonly Dictionary<string, string> _structMaskDict;
 
-        public MaskingEnricher(Dictionary<string, string> directlyMaskDict, Dictionary<string, string> structMaskDict)
+        public SerilogMaskingEnricher(Dictionary<string, string> directlyMaskDict, Dictionary<string, string> structMaskDict)
         {
             _directlyMaskDict = directlyMaskDict;
             _structMaskDict = structMaskDict;
