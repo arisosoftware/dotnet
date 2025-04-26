@@ -5,30 +5,69 @@ using System.Collections.Concurrent;
 
 namespace SerilogMask.Core.Logging
 {
-    public class SerilogInMemorySink : ILogEventSink, IDisposable
+public class SerilogInMemorySink : ILogEventSink
     {
-        public static readonly SerilogInMemorySink Instance = new();
-        private SerilogInMemorySink()
+        private static SerilogInMemorySink? _instance; // Add the missing static field
+        private readonly List<LogEvent> _events;
+        private readonly object _lockObject;
+
+        public static SerilogInMemorySink? Instance
         {
+            get
+            {
+                if (_instance == null)
+                {
+                    _instance = new SerilogInMemorySink();
+                }
+                return _instance;
+            }
         }
-     
-        private readonly ConcurrentBag<LogEvent> _logEvents = new();
+
+        public SerilogInMemorySink()
+        {
+            _events = new List<LogEvent>();
+            _lockObject = new object();
+            _instance = this; // Update the static field here
+        }
 
         public void Emit(LogEvent logEvent)
         {
-            _logEvents.Add(logEvent);
+            if (logEvent == null)
+            {
+                return;
+            }
+
+            lock (_lockObject)
+            {
+                _events.Add(logEvent);
+            }
         }
 
-        public IReadOnlyCollection<LogEvent> LogEvents => _logEvents;
+        public List<LogEvent> GetAllEvents()
+        {
+            lock (_lockObject)
+            {
+                return new List<LogEvent>(_events);
+            }
+        }
 
         public void Clear()
         {
-            _logEvents.Clear();
+            lock (_lockObject)
+            {
+                _events.Clear();
+            }
         }
 
-        public void Dispose()
+        public int Count
         {
-           _logEvents.Clear();
+            get
+            {
+                lock (_lockObject)
+                {
+                    return _events.Count;
+                }
+            }
         }
     }
 }

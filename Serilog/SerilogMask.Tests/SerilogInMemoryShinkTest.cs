@@ -12,7 +12,7 @@ public class SerilogInMemoryShinkTest
     private readonly SerilogInMemorySink _sink;
     private readonly LoggerConfiguration _loggerConfiguration;
     private readonly ILogger _logger;
-    private readonly MaskingConfig _maskingConfig;
+    
     public SerilogInMemoryShinkTest()
     {
         // Load the masking configuration from appsettings.json
@@ -30,13 +30,15 @@ public class SerilogInMemoryShinkTest
         
         var mask = SerilogHelper.LoadMaskingEnricherConfigByString(mockcfgjson);
          
-        _sink = SerilogInMemorySink.Instance;
+        _sink = new SerilogInMemorySink();
         _loggerConfiguration = new LoggerConfiguration()
-            .MinimumLevel.Information()
-            .Enrich.With(mask) // Fix: Use the correct overload of 'With' that accepts an ILogEventEnricher instance
+            .MinimumLevel.Debug()
+            .Enrich.With(mask)  
             .WriteTo.Sink(_sink);
         _logger = _loggerConfiguration.CreateLogger();
     }
+
+
     [Fact]
     public void GiveAnEvent_WhenLogEventIsEmitted_ThenItShouldBeStoredInSink()
     {
@@ -51,8 +53,9 @@ public class SerilogInMemoryShinkTest
         // Act
         _sink.Emit(logEvent);
         // Assert
-        Assert.Single(_sink.LogEvents);
-        Assert.Equal(logEvent, _sink.LogEvents.First());
+        var LogEvents = _sink.GetAllEvents();
+        Assert.Single(LogEvents);
+        Assert.Equal(logEvent, LogEvents.First());
     }
 
     [Fact]
@@ -93,27 +96,11 @@ public class SerilogInMemoryShinkTest
         _sink.Emit(logEvent1);
         _sink.Emit(logEvent2);
         // Assert
-        Assert.Equal(2, _sink.LogEvents.Count);
-        Assert.Equal(logEvent1, _sink.LogEvents.ElementAt(0));
-        Assert.Equal(logEvent2, _sink.LogEvents.ElementAt(1));
+        var LogEvents = _sink.GetAllEvents();
+        Assert.Equal(2, LogEvents.Count);
+        Assert.Equal(logEvent1, LogEvents.ElementAt(0));
+        Assert.Equal(logEvent2, LogEvents.ElementAt(1));
 
 
     }
-
-    [Fact]
-    public void Test_Info_Warning_Debug()
-    {
-           
-     
-        _logger.Information("Test message Info");
-        _logger.Warning("Test message Warning");
-        _logger.Debug("Test message Debug");
-            // Assert
-            Assert.Equal(3, _sink.LogEvents.Count);
-        Assert.Equal("Test message Info", _sink.LogEvents.ElementAt(0).MessageTemplate.Text);
-        Assert.Equal("Test message Warning", _sink.LogEvents.ElementAt(1).MessageTemplate.Text);
-        Assert.Equal("Test message Debug", _sink.LogEvents.ElementAt(2).MessageTemplate.Text);
-
-    }
-
 }

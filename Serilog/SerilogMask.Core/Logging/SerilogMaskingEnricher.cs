@@ -28,41 +28,42 @@ namespace SerilogMask.Core.Logging
             {
                 string propName = prop.Key;
                 LogEventPropertyValue propValue = prop.Value;
-
+                string? maskValue = null;
                 // Check if the property is a direct property (not part of a structure)
-                if (_directlyMaskDict.TryGetValue(propName, out string maskValue))
+                if (_directlyMaskDict.TryGetValue(propName, out maskValue))
                 {
-                    // Apply the mask from DirectlyMaskDict
+                    if (string.IsNullOrEmpty(maskValue))
+                    {
+                        continue;
+                    }
                     updatedProperties[propName] = new ScalarValue(maskValue);
                 }
                 else if (propValue is StructureValue structVal)
                 {
-                    // If the property is part of a structure (e.g., UserDTO), handle it using the StructMaskDict
                     var maskedProps = new List<LogEventProperty>();
 
                     foreach (var p in structVal.Properties)
                     {
                         string fullName = propName + "." + p.Name; // Full key (e.g., UserDTO.Email)
 
-                        // Check if the full property name exists in StructMaskDict
                         if (_structMaskDict.TryGetValue(fullName, out maskValue))
                         {
+                            if (string.IsNullOrEmpty(maskValue))
+                            {
+                                continue;
+                            }
                             maskedProps.Add(new LogEventProperty(p.Name, new ScalarValue(maskValue)));
                         }
                         else
                         {
-                            // If not found in the struct mask map, retain the original property
                             maskedProps.Add(p);
                         }
                     }
-
-                    // Reconstruct the structure with the masked properties
                     StructureValue maskedStruct = new StructureValue(maskedProps, structVal.TypeTag);
                     updatedProperties[propName] = maskedStruct;
                 }
                 else
                 {
-                    // If the property is neither direct nor part of a structure, just keep it as is
                     updatedProperties[propName] = propValue;
                 }
             }
