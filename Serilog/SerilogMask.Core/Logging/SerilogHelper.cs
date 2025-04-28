@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Core;
 using Serilog.Events;
@@ -10,6 +11,61 @@ namespace SerilogMask.Core.Logging;
 
 public static class SerilogHelper
 {
+
+    public static void SetupSerilog(IConfiguration configuration)
+    {
+        // Load the Masking configuration from the appsettings.json
+        var maskConfig = configuration.GetSection("Serilog:Masking").Get<Dictionary<string, string>>();
+
+        // Serialize the mask configuration to JSON string
+        string mockcfgjson = JsonSerializer.Serialize(maskConfig);
+
+        // Load the enricher based on the config string
+        var enricher = LoadMaskingEnricherConfigByString(mockcfgjson);
+
+        // Setup Serilog configuration
+        Log.Logger = new LoggerConfiguration()
+            .ReadFrom.Configuration(configuration)  // Read other configurations from appsettings.json
+            .Enrich.With(enricher)                // Add the custom MaskingEnricher here
+            .WriteTo.Console()                    // Log to console (add more sinks if needed)
+            .CreateLogger();
+    }
+
+    public static SerilogMaskingEnricher LoadMaskingEnricherConfigByString(string json)
+    {
+        var configDict = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+
+        if (configDict == null)
+        {
+            throw new ArgumentNullException(nameof(json), "The provided JSON string could not be deserialized into a dictionary.");
+        }
+
+        // Separate into Direct and Struct masks
+        var directlyMaskDict = new Dictionary<string, string>();
+        var structMaskDict = new Dictionary<string, string>();
+
+        foreach (var entry in configDict)
+        {
+            string key = entry.Key;
+            string maskValue = entry.Value;
+
+            if (key.Contains("."))
+            {
+                // It's a struct property (e.g., "UserDTO.Email")
+                structMaskDict[key] = maskValue;
+            }
+            else
+            {
+                // It's a direct property (e.g., "Email")
+                directlyMaskDict[key] = maskValue;
+            }
+        }
+
+        // Return the MaskingEnricher with the two dictionaries
+        return new SerilogMaskingEnricher(directlyMaskDict, structMaskDict);
+    }
+
+
     public static void SetupSerilog()
     {
  
@@ -43,15 +99,20 @@ public static class SerilogHelper
         return LoadMaskingEnricherConfigByString(json);
     }
     // Existing code remains unchanged
-    public static SerilogMaskingEnricher LoadMaskingEnricherConfigByString(string json)
-    {
-        var configDict = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
+    //public static SerilogMaskingEnricher LoadMaskingEnricherConfigByString(string json)
+    //{
+    //    var configDict = JsonSerializer.Deserialize<Dictionary<string, string>>(json);
 
-        if (configDict == null)
-        {
-            throw new ArgumentNullException(nameof(json), "The provided JSON string could not be deserialized into a dictionary.");
-        }
+    //    if (configDict == null)
+    //    {
+    //        throw new ArgumentNullException(nameof(json), "The provided JSON string could not be deserialized into a dictionary.");
+    //    }
+    //    return LoadMaskingEnricherConfig(configDict);
+    //}
 
+
+    public static SerilogMaskingEnricher LoadMaskingEnricherConfig(Dictionary<string, string> configDict)
+    { 
         // Separate into Direct and Struct masks
         var directlyMaskDict = new Dictionary<string, string>();
         var structMaskDict = new Dictionary<string, string>();

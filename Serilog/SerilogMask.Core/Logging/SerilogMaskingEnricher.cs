@@ -12,6 +12,12 @@ namespace SerilogMask.Core.Logging
         private readonly Dictionary<string, string> _directlyMaskDict;
         private readonly Dictionary<string, string> _structMaskDict;
 
+        public Dictionary<string, string> GetDirectlyMaskDict()
+        {
+            return _directlyMaskDict;
+        }
+
+
         public SerilogMaskingEnricher(Dictionary<string, string> directlyMaskDict, Dictionary<string, string> structMaskDict)
         {
             _directlyMaskDict = directlyMaskDict;
