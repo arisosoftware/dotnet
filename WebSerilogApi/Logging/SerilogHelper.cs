@@ -6,17 +6,12 @@ using System.Linq;
 using System.Reflection;
 
 
-public static class SerilogConfiguration
+public static class SerilogHelper
 {
     public static void ConfigureLogger()
     {
 
-        var rules = new List<ISensitiveDataRule>
-            {
-                new EmailSensitiveDataRule(),
-                new  PhoneNumberSensitiveDataRule   (),
-            };
-
+        
         var sensitivePolicy = new SensitiveDataDestructuringPolicy(rules);
 
         Log.Logger = new LoggerConfiguration()
