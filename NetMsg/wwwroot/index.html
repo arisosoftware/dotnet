@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>LAN Chat</title>
+  <meta charset="utf-8" />
+</head>
+<body>
+  <h1>LAN Chat</h1>
+  <p>Your Name: <span id="myname"></span></p>
+  <p>Your IP: <span id="myip"></span></p>
+
+  <h2>Online Peers</h2>
+  <ul id="peerlist"></ul>
+
+  <h2>Send Message</h2>
+  <input type="text" id="targetip" placeholder="Target IP" />
+  <input type="text" id="message" placeholder="Message" />
+  <button onclick="sendMessage()">Send</button>
+
+  <script>
+    async function loadSelf() {
+      const res = await fetch('/api/self');
+      const json = await res.json();
+      document.getElementById('myname').textContent = json.name;
+      document.getElementById('myip').textContent = json.ip;
+    }
+
+    async function loadPeers() {
+      const res = await fetch('/api/peers');
+      const list = await res.json();
+      const ul = document.getElementById('peerlist');
+      ul.innerHTML = '';
+      list.forEach(p => {
+        const li = document.createElement('li');
+        li.textContent = `${p.name} (${p.ip})`;
+        ul.appendChild(li);
+      });
+    }
+
+    async function sendMessage() {
+      const ip = document.getElementById('targetip').value;
+      const msg = document.getElementById('message').value;
+      await fetch(`http://${ip}:5000/api/message`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ from: 'me', text: msg })
+      });
+      alert('Sent!');
+    }
+
+    loadSelf();
+    loadPeers();
+    setInterval(loadPeers, 5000);
+  </script>
+</body>
+</html>
