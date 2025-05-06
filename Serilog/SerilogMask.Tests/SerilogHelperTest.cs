@@ -39,8 +39,8 @@ public class SerilogHelperTest
         SerilogMaskingEnricher maskenrich = SerilogHelper.LoadMaskingEnricherConfigByString(mockcfgjson);
         // Assert
         Assert.NotNull(maskenrich);
-        Assert.Equal(3, maskenrich.GetDirectlyMaskDict().Count);
         Assert.Equal(3, maskenrich.GetStructMaskDict().Count);
+        Assert.Equal(3, maskenrich.GetDirectlyMaskDict().Count);
         Assert.Equal("***Mask***", maskenrich.GetDirectlyMaskDict()["Email"]);
         Assert.Equal("***MaskEmail***", maskenrich.GetStructMaskDict()["UserDTO.Email"]);
         Assert.Equal("***MaskName***", maskenrich.GetStructMaskDict()["UserDTO.Name"]);

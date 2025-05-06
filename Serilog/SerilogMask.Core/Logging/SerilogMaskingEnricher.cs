@@ -17,6 +17,10 @@ namespace SerilogMask.Core.Logging
             return _directlyMaskDict;
         }
 
+        public Dictionary<string, string> GetStructMaskDict()
+        {
+            return _structMaskDict;
+        }
 
         public SerilogMaskingEnricher(Dictionary<string, string> directlyMaskDict, Dictionary<string, string> structMaskDict)
         {
@@ -81,51 +85,34 @@ namespace SerilogMask.Core.Logging
                 logEvent.AddOrUpdateProperty(new LogEventProperty(prop.Key, prop.Value));
             }
         }
+
+
+        public static SerilogMaskingEnricher LoadMaskingEnricherConfigByString(string json)
+        {
+            var config = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, string>>>(json);
+            if (config == null)
+            {
+                throw new ArgumentNullException(nameof(config));
+            }
+            return new SerilogMaskingEnricher(config["directlyMask"], config["structMask"]);
+
+        }
+        public static SerilogMaskingEnricher LoadMaskingEnricherConfigByDictionary(Dictionary<string, string> directlyMaskDict, Dictionary<string, string> structMaskDict)
+        {
+            if (directlyMaskDict == null || structMaskDict == null)
+            {
+                throw new ArgumentNullException(nameof(directlyMaskDict));
+            }
+            return new SerilogMaskingEnricher(directlyMaskDict, structMaskDict);
+        }
+        public static SerilogMaskingEnricher LoadMaskingEnricherConfigByDictionary(Dictionary<string, string> directlyMaskDict)
+        {
+            if (directlyMaskDict == null)
+            {
+                throw new ArgumentNullException(nameof(directlyMaskDict));
+            }
+            return new SerilogMaskingEnricher(directlyMaskDict, new Dictionary<string, string>());
+        }
     }
 }
 
-
-//public class SerilogMaskingEnricher : ILogEventEnricher
-//{
-//    public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
-//    {
-//        foreach (var property in logEvent.Properties)
-//        {
-//            if (property.Key.Contains("password", StringComparison.OrdinalIgnoreCase))
-//            {
-//                logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty(property.Key, "****"));
-//            }
-//        }
-//    }
-//}
-
-//public class MaskingEnricher : ILogEventEnricher
-//{
-//    private readonly Dictionary<string, string> _maskMap;
-
-//    public MaskingEnricher(Dictionary<string, string> maskMap) => _maskMap = maskMap;
-
-//    public void Enrich(LogEvent logEvent, ILogEventPropertyFactory propertyFactory)
-//    {
-//        foreach (var kvp in logEvent.Properties.ToList())
-//        {
-//            if (_maskMap.TryGetValue(kvp.Key, out var mask))
-//            {
-//                logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty(kvp.Key, mask));
-//            }
-//            else if (kvp.Value is StructureValue structVal && structVal.TypeTag == "UserDTO")
-//            {
-//                var maskedProps = structVal.Properties
-//                    .Select(p =>
-//                        _maskMap.TryGetValue("UserDTO." + p.Name, out var m)
-//                            ? new LogEventProperty(p.Name, new ScalarValue(m))
-//                            : p)
-//                    .ToList();
-
-//                logEvent.AddOrUpdateProperty(propertyFactory.CreateProperty(kvp.Key, new StructureValue(maskedProps, structVal.TypeTag)));
-//            }
-//        }
-//    }
-
-
-//}
